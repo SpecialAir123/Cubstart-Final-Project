@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D99C99B2B16944C004068CC /* User Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D99C99A2B16944C004068CC /* User Model.swift */; };
 		3E39C0E82B0F1E2E00FC5F14 /* CubStartFinalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E39C0E72B0F1E2E00FC5F14 /* CubStartFinalApp.swift */; };
 		3E39C0EA2B0F1E2E00FC5F14 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E39C0E92B0F1E2E00FC5F14 /* ContentView.swift */; };
 		3E39C0EC2B0F1E2E00FC5F14 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E39C0EB2B0F1E2E00FC5F14 /* Item.swift */; };
@@ -36,6 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0D99C99A2B16944C004068CC /* User Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "User Model.swift"; sourceTree = "<group>"; };
 		3E39C0E42B0F1E2E00FC5F14 /* CubStartFinal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CubStartFinal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3E39C0E72B0F1E2E00FC5F14 /* CubStartFinalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubStartFinalApp.swift; sourceTree = "<group>"; };
 		3E39C0E92B0F1E2E00FC5F14 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 		3E39C0E62B0F1E2E00FC5F14 /* CubStartFinal */ = {
 			isa = PBXGroup;
 			children = (
+				0D99C99A2B16944C004068CC /* User Model.swift */,
 				3E39C0E72B0F1E2E00FC5F14 /* CubStartFinalApp.swift */,
 				3E39C0E92B0F1E2E00FC5F14 /* ContentView.swift */,
 				3E39C0EB2B0F1E2E00FC5F14 /* Item.swift */,
@@ -266,6 +269,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3E39C0EA2B0F1E2E00FC5F14 /* ContentView.swift in Sources */,
+				0D99C99B2B16944C004068CC /* User Model.swift in Sources */,
 				3E39C1172B0F207400FC5F14 /* WorldView.swift in Sources */,
 				3E39C0EC2B0F1E2E00FC5F14 /* Item.swift in Sources */,
 				3E39C0E82B0F1E2E00FC5F14 /* CubStartFinalApp.swift in Sources */,
