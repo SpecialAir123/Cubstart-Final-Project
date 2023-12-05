@@ -95,11 +95,23 @@ struct FeastLoginView: View {
                 Spacer()
                 
                 // Image at the top of the login view
-                Image("Culinary")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 120, height: 120)
-                    .padding(.bottom, 20)
+                ZStack {
+                    Circle()
+                        .fill(Color.pink.opacity(0.2))
+                        .frame(width: 180, height: 180)
+
+                    Image("Culinary")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 180, height: 180) // Adjust the size as needed
+                        .clipShape(Circle())
+                        .overlay(Circle().stroke(Color.pink.opacity(0.2), lineWidth: 3))
+                        .offset(y: -10)
+
+                }
+                .padding(.bottom)
+
+
                 Spacer()
                 
                 // Displays error message for incorrect credentials
@@ -135,10 +147,11 @@ struct FeastLoginView: View {
                     Button(action: signInOrSignUp) {
                         Text(isSignUp ? "Sign Up" : "Sign In")
                             .padding()
-                            .foregroundColor(.black)
-                            .background(Color.white)
+                            .foregroundColor(AppColors.secondaryColor)
+                            .background(AppColors.primaryColor)
                             .cornerRadius(20)
                     }
+
                     // Transition to ProfileView on successful login
                     .fullScreenCover(isPresented: $userSession.isLoggedIn) {
                         NavigationView {
@@ -214,7 +227,11 @@ struct FeastLoginView: View {
     }
 }
 
-
+struct AppColors {
+    static let primaryColor = Color.pink.opacity(0.2)
+    static let secondaryColor = Color.white
+    static let accentColor = Color.green
+}
 
 struct FeastLoginView_Previews: PreviewProvider {
     static var previews: some View {
@@ -248,7 +265,7 @@ struct ProfileView: View {
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 120, height: 120)
                     .clipShape(Circle())
-                    .overlay(Circle().stroke(Color.gray, lineWidth: 4))
+                    .overlay(Circle().stroke(Color.pink.opacity(0.2), lineWidth: 4))
                     .shadow(radius: 10)
                     .padding(.top, 20)
 
@@ -264,7 +281,7 @@ struct ProfileView: View {
                     Text("Country: \(editableProfileData.country)")
                 }
                 .font(.body)
-                .foregroundColor(.gray)
+                .foregroundColor(.black)
                 
                 // Horizontal stack for displaying additional user stats
                 HStack {
@@ -288,8 +305,8 @@ struct ProfileView: View {
                 NavigationLink(destination: RecipesView()){
                             Text("View Favorite Recipes")
                                 .padding()
-                                .background(Color.white)
-                                .foregroundColor(.black)
+                                .foregroundColor(AppColors.secondaryColor)
+                                .background(AppColors.primaryColor)
                                 .cornerRadius(20)
                 } .padding()
                 
@@ -298,8 +315,8 @@ struct ProfileView: View {
                     showingEditProfile = true // Triggers the sheet to edit profile
                 }
                 .padding()
-                .background(Color.white)
-                .foregroundColor(.black)
+                .foregroundColor(AppColors.secondaryColor)
+                .background(AppColors.primaryColor)
                 .cornerRadius(20)
                 .sheet(isPresented: $showingEditProfile) {
                     // Sheet to edit the profile, passing the binding to editable data
@@ -311,9 +328,8 @@ struct ProfileView: View {
                 // Log out button
                 Button("Log Out", action: logOut)
                     .padding()
-                    .frame(maxWidth: .infinity)
                     .background(Color.red)
-                    .foregroundColor(.black)
+                    .foregroundColor(.white)
                     .cornerRadius(20)
                     .padding()
             }
@@ -381,8 +397,8 @@ struct EditProfileView: View {
                 presentationMode.wrappedValue.dismiss() // Dismisses the view
             }
             .padding()
-            .background(Color.white)
-            .foregroundColor(.black)
+            .foregroundColor(AppColors.secondaryColor)
+            .background(AppColors.primaryColor)
             .cornerRadius(20)
             .shadow(radius: 5)
 
@@ -441,6 +457,7 @@ struct RecipesView: View {
             favoriteRecipes.recipes.append(Recipe(name: "New Recipe", rating: 5, ingredients: []))
         }
     }
+
 class FavoriteRecipes: ObservableObject {
     @Published var recipes: [Recipe] = [
         Recipe(name: "Insert Recipe Here", rating: 4.5, ingredients: []),
@@ -576,17 +593,6 @@ struct RecipeDetailView: View {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-    
 
 
 
