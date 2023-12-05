@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 class UserSession: ObservableObject {
     @Published var isLoggedIn: Bool = false
@@ -16,6 +17,61 @@ class UserCredentials: ObservableObject {
     @Published var password: String = ""
     @Published var confirmed_password: String = ""
 }
+
+class TimerModel: ObservableObject {
+    @Published var timeRemaining: TimeInterval = 0
+    @Published var timerEnded: Bool = false
+    var originalDuration: TimeInterval = 0
+    var timer: Timer?
+    weak var presentingView: UIViewController?
+    
+    func startTimer(duration: TimeInterval) {
+        originalDuration = duration
+        timeRemaining = duration
+        timer?.invalidate() // Invalidate existing timer if any
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            if self.timeRemaining > 0 {
+                self.timeRemaining -= 1
+            } else {
+                // Timer completed, handle as needed
+                self.timer?.invalidate()
+                self.timer = nil
+                self.timerEnded = true
+                
+                if let presentingView = self.presentingView {
+                    self.showTimerEndedPopup(in: presentingView)
+                }
+            }
+        }
+    }
+
+    func pauseTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+
+    func resumeTimer() {
+        if timeRemaining > 0 {
+            startTimer(duration: timeRemaining)
+        }
+    }
+
+    func resetTimer() {
+        timer?.invalidate()
+        timer = nil
+        timeRemaining = originalDuration
+        originalDuration = 0 // Reset original duration to 0
+        timerEnded = false
+    }
+    func showTimerEndedPopup(in viewController: UIViewController){
+        let alertController = UIAlertController(title: "Timer Ended", message: "Time's up!", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+
+        viewController.present(alertController, animated: true, completion: nil)
+    }
+}
+
+
 
 struct FeastLoginView: View {
     // Environment objects for managing user session and credentials
@@ -180,7 +236,7 @@ struct ProfileView: View {
     var userPhoto: String = "userPlaceholder" // Placeholder for user photo
 
     // States for managing editable profile data and view control
-    @State private var editableProfileData = EditableProfileData(made: "", goal: "", fav: "")
+    @State private var editableProfileData = EditableProfileData(age: "", sex: "", country: "")
     @State private var showingEditProfile = false
 
     var body: some View {
@@ -203,9 +259,9 @@ struct ProfileView: View {
 
                 // Group of text displaying user's editable profile data
                 Group {
-                    Text("What I Made This Week: \(editableProfileData.made)")
-                    Text("Next Thing to Cook: \(editableProfileData.goal)")
-                    Text("Favorite Cuisine: \(editableProfileData.fav)")
+                    Text("Age: \(editableProfileData.age)")
+                    Text("Sex: \(editableProfileData.sex)")
+                    Text("Country: \(editableProfileData.country)")
                 }
                 .font(.body)
                 .foregroundColor(.gray)
@@ -215,7 +271,14 @@ struct ProfileView: View {
                     VStack {
                         Text("Recipes Saved")
                             .font(.headline)
-                        Text("\(favoriteRecipes.recipes.count)")
+                        Text("25")
+                            .font(.title2)
+                    }
+                    Spacer()
+                    VStack {
+                        Text("Recipes Shared")
+                            .font(.headline)
+                        Text("15")
                             .font(.title2)
                     }
                 }.padding()
@@ -266,9 +329,9 @@ struct ProfileView: View {
 }
 
 struct EditableProfileData {
-    var made: String
-    var goal: String
-    var fav: String
+    var age: String
+    var sex: String
+    var country: String
 }
 
 struct EditProfileView: View {
@@ -289,7 +352,7 @@ struct EditProfileView: View {
                 .padding(.top, 20)
 
             // Text field for editing the age
-            TextField("What I Made This Week", text: $profileData.made)
+            TextField("Age", text: $profileData.age)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
                 .background(Color.white)
@@ -297,7 +360,7 @@ struct EditProfileView: View {
                 .shadow(radius: 5)
             
             // Text field for editing the sex
-            TextField("Next Thing to Cook", text: $profileData.goal)
+            TextField("Sex", text: $profileData.sex)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
                 .background(Color.white)
@@ -305,7 +368,7 @@ struct EditProfileView: View {
                 .shadow(radius: 5)
 
             // Text field for editing the country
-            TextField("Favorite Cuisine", text: $profileData.fav)
+            TextField("Country", text: $profileData.country)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
                 .background(Color.white)
@@ -335,17 +398,11 @@ struct EditProfileView: View {
 
 */
 
-struct Ingredient: Identifiable {
-    var id = UUID()
-    var name: String
-    var amount: String
-}
-
 struct Recipe: Identifiable {
     var id = UUID()
     var name: String
     var rating: Double
-    var ingredients: [Ingredient]
+    var ingredients: [String]
 }
 
 struct RecipesView: View {
@@ -386,8 +443,9 @@ struct RecipesView: View {
     }
 class FavoriteRecipes: ObservableObject {
     @Published var recipes: [Recipe] = [
+        Recipe(name: "Insert Recipe Here", rating: 4.5, ingredients: []),
         Recipe(name: "Chocolate Lava Cake", rating: 4.7, ingredients: []),
-        Recipe(name: "Lemon Pork Loin", rating: 4.3, ingredients: []),
+        Recipe(name: "Lemon Pork Loin", rating: 4.5, ingredients: []),
         Recipe(name: "Roast Beef Sandwich", rating: 4.6, ingredients: [])
     ]
 }
@@ -408,32 +466,29 @@ struct EditRatingView: View {
         }
 }
 struct EditIngredientsView: View {
-    @Binding var ingredients: [Ingredient]
-    @State private var newName: String = ""
-    @State private var newAmount: String = ""
-
+    @Binding var ingredients: [String]
+    @State private var newIngredient: String = ""
+    
     var body: some View {
         List {
             Section(header: Text("Add Ingredient")) {
-                TextField("Ingredient Name", text: $newName)
-                TextField("Amount (e.g., 2 cups)", text: $newAmount)
-                Button("Add") {
-                    let ingredient = Ingredient(name: newName, amount: newAmount)
-                    ingredients.append(ingredient)
-                    // Reset the input fields after adding
-                    newName = ""
-                    newAmount = ""
+                HStack {
+                    TextField("New Ingredient", text: $newIngredient)
+                    Button(action: {
+                        withAnimation {
+                            ingredients.append(newIngredient)
+                            newIngredient = ""
+                        }
+                    }) {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundColor(.green)
+                    }
                 }
             }
-
-            Section(header: Text("Current Ingredients")) {
-                ForEach(ingredients) { ingredient in
-                    VStack(alignment: .leading) {
-                        Text(ingredient.name)
-                            .fontWeight(.bold)
-                        Text(ingredient.amount)
-                            .italic()
-                    }
+            
+            Section(header: Text("Ingredients")) {
+                ForEach(ingredients, id: \.self) { ingredient in
+                    Text(ingredient)
                 }
                 .onDelete(perform: deleteIngredient)
             }
@@ -446,35 +501,93 @@ struct EditIngredientsView: View {
     }
 }
 
-
 struct RecipeDetailView: View {
     @Binding var recipe: Recipe
-
+    @StateObject var timerModel = TimerModel()
+    @State private var editingDuration = false
+    @State private var editedDuration = ""
+    @State private var showingTimerEndedAlert = false
+    
     var body: some View {
         Form {
             Section(header: Text("Recipe Name")) {
                 TextField("Name", text: $recipe.name)
             }
             
-            Section {
+            Section(header: Text("Rating")) {
                 NavigationLink(destination: EditRatingView(recipe: $recipe)) {
                     Text("Edit Rating")
                 }
             }
-
+            
             Section(header: Text("Ingredients")) {
                 NavigationLink(destination: EditIngredientsView(ingredients: $recipe.ingredients)) {
                     Text("Edit Ingredients")
                 }
+            }
+            
+            Section(header: Text("Timer")){
+                HStack {
+                    Text("Time Remaining: \(Int(timerModel.timeRemaining)) seconds")
+                        .padding(.vertical)
+                    
+                    if !editingDuration {
+                        Button("Edit") {
+                            editingDuration = true
+                            editedDuration = "\(Int(timerModel.originalDuration))"
+                        }
+                    } else {
+                        TextField("Edit Time", text: $editedDuration) { editing in
+                            // Handle editing events if needed
+                        } onCommit: {
+                            if let newDuration = TimeInterval(editedDuration) {
+                                timerModel.originalDuration = newDuration
+                                editingDuration = false
+                            }
+                        }
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                        .padding(.horizontal)
+                    }
+                }
+
+                Button("Start"){
+                    timerModel.startTimer(duration: timerModel.originalDuration)
+                }
+                .disabled(editingDuration) // disables Start button during editing
                 
-                ForEach(recipe.ingredients) { ingredient in
-                    Text("\(ingredient.amount) \(ingredient.name)")
+                Button("Pause"){
+                    timerModel.pauseTimer()
+                }
+                Button("Resume"){
+                    timerModel.resumeTimer()
+                }
+                Button("Reset Timer"){
+                    timerModel.resetTimer()
                 }
             }
         }
         .navigationBarTitle("Recipe Details", displayMode: .inline)
+        .environmentObject(timerModel)
+        .alert(isPresented: $timerModel.timerEnded) {
+            Alert(title: Text("Time's up!"), dismissButton: .default(Text("OK")))
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+    
+
 
 
 
