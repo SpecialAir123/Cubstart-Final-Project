@@ -17,6 +17,9 @@
 		3E39C1062B0F1E3200FC5F14 /* CubStartFinalUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E39C1052B0F1E3200FC5F14 /* CubStartFinalUITests.swift */; };
 		3E39C1082B0F1E3200FC5F14 /* CubStartFinalUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E39C1072B0F1E3200FC5F14 /* CubStartFinalUITestsLaunchTests.swift */; };
 		3E39C1172B0F207400FC5F14 /* WorldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E39C1162B0F207400FC5F14 /* WorldView.swift */; };
+		CB5CB92C2B16EF010048FD26 /* RecipePull.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5CB92B2B16EF010048FD26 /* RecipePull.swift */; };
+		CB5CB92E2B1702590048FD26 /* RecipeViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5CB92D2B1702590048FD26 /* RecipeViewer.swift */; };
+		CB5CB9302B1EBFB70048FD26 /* RecipeBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5CB92F2B1EBFB70048FD26 /* RecipeBook.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +54,9 @@
 		3E39C1052B0F1E3200FC5F14 /* CubStartFinalUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubStartFinalUITests.swift; sourceTree = "<group>"; };
 		3E39C1072B0F1E3200FC5F14 /* CubStartFinalUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CubStartFinalUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		3E39C1162B0F207400FC5F14 /* WorldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorldView.swift; sourceTree = "<group>"; };
+		CB5CB92B2B16EF010048FD26 /* RecipePull.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipePull.swift; sourceTree = "<group>"; };
+		CB5CB92D2B1702590048FD26 /* RecipeViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeViewer.swift; sourceTree = "<group>"; };
+		CB5CB92F2B1EBFB70048FD26 /* RecipeBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeBook.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,8 +110,11 @@
 				0D99C99A2B16944C004068CC /* User Model.swift */,
 				3E39C0E72B0F1E2E00FC5F14 /* CubStartFinalApp.swift */,
 				3E39C0E92B0F1E2E00FC5F14 /* ContentView.swift */,
+				CB5CB92F2B1EBFB70048FD26 /* RecipeBook.swift */,
 				3E39C0EB2B0F1E2E00FC5F14 /* Item.swift */,
 				3E39C1162B0F207400FC5F14 /* WorldView.swift */,
+				CB5CB92B2B16EF010048FD26 /* RecipePull.swift */,
+				CB5CB92D2B1702590048FD26 /* RecipeViewer.swift */,
 				3E39C0ED2B0F1E3200FC5F14 /* Assets.xcassets */,
 				3E39C0EF2B0F1E3200FC5F14 /* CubStartFinal.entitlements */,
 				3E39C0F02B0F1E3200FC5F14 /* Preview Content */,
@@ -268,10 +277,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CB5CB92C2B16EF010048FD26 /* RecipePull.swift in Sources */,
+				CB5CB92E2B1702590048FD26 /* RecipeViewer.swift in Sources */,
 				3E39C0EA2B0F1E2E00FC5F14 /* ContentView.swift in Sources */,
 				0D99C99B2B16944C004068CC /* User Model.swift in Sources */,
 				3E39C1172B0F207400FC5F14 /* WorldView.swift in Sources */,
 				3E39C0EC2B0F1E2E00FC5F14 /* Item.swift in Sources */,
+				CB5CB9302B1EBFB70048FD26 /* RecipeBook.swift in Sources */,
 				3E39C0E82B0F1E2E00FC5F14 /* CubStartFinalApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
