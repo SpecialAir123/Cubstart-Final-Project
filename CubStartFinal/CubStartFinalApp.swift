@@ -9,13 +9,16 @@ import SwiftUI
 import SwiftData
 
 @main
-struct YourAppName: App {
+struct CulinaryConnect: App {
     @StateObject var userSession = UserSession()  // Create an instance of UserSession
+    @StateObject var favoriteRecipes = FavoriteRecipes(recipes:[])
 
     var body: some Scene {
         WindowGroup {
-            FeastLoginView()
+            ContentView()
+                .modelContainer(for: [Recipe.self, FavoriteRecipes.self])
                 .environmentObject(userSession)  // Inject UserSession into FeastLoginView
+                .environmentObject(favoriteRecipes)
         }
     }
 }

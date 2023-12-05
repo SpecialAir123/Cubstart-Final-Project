@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+import SwiftData
 
 class UserSession: ObservableObject {
-    @Published var isLoggedIn: Bool = true
+    @Published var isLoggedIn: Bool = false
 }
 
 class UserCredentials: ObservableObject {
@@ -17,7 +18,7 @@ class UserCredentials: ObservableObject {
     @Published var confirmed_password: String = ""
 }
 
-struct FeastLoginView: View {
+struct ContentView: View {
     // Environment objects for managing user session and credentials
     @EnvironmentObject var userSession: UserSession
     @EnvironmentObject var userCredentials: UserCredentials
@@ -29,6 +30,11 @@ struct FeastLoginView: View {
     @State private var confirmedPassword: String = ""
     @State private var wrongPassword: Bool = false
     @State private var showSignUpSuccessMessage = false
+    
+    // Connects RecipeBook Screen
+    @Environment(\.modelContext) private var
+        modelContext
+    @Query var favoriteRecipes: [Recipe]
 
     var body: some View {
         NavigationView {
@@ -82,7 +88,10 @@ struct FeastLoginView: View {
                     }
                     // Transition to ProfileView on successful login
                     .fullScreenCover(isPresented: $userSession.isLoggedIn) {
-                        ProfileView(username: username)
+                        NavigationView {
+                            ProfileView(username: username)
+                                .environmentObject(favoriteRecipes)
+                        }
                     }
                     // Alert for successful sign-up
                     .alert(isPresented: $showSignUpSuccessMessage) {
@@ -155,12 +164,11 @@ struct FeastLoginView: View {
 
     
 
-
-
 struct FeastLoginView_Previews: PreviewProvider {
     static var previews: some View {
-        FeastLoginView()
+        ContentView()
             .environmentObject(UserSession()) // Providing UserSession environment object for the preview
+            .environmentObject(FavoriteRecipes(recipes:[]))
     }
 }
 
@@ -168,6 +176,8 @@ struct FeastLoginView_Previews: PreviewProvider {
 struct ProfileView: View {
     // Environment object to manage user session state
     @EnvironmentObject var userSession: UserSession
+    // Object for favorite recipes view
+    @EnvironmentObject var favoriteRecipes: FavoriteRecipes
     
     // Properties for user profile information
     var username: String
@@ -222,6 +232,16 @@ struct ProfileView: View {
                 }.padding()
 
                 // Button to edit the culinary profile
+                
+                NavigationLink(destination: RecipesView()){
+                            Text("View Favorite Recipes")
+                                .padding()
+                                .background(Color.white)
+                                .foregroundColor(.black)
+                                .cornerRadius(20)
+                } .padding()
+                
+                
                 Button("Edit Culinary Profile") {
                     showingEditProfile = true // Triggers the sheet to edit profile
                 }
@@ -240,7 +260,7 @@ struct ProfileView: View {
                 Button("Log Out", action: logOut)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.white)
+                    .background(Color.red)
                     .foregroundColor(.black)
                     .cornerRadius(20)
                     .padding()
@@ -320,6 +340,158 @@ struct EditProfileView: View {
         .background(Color.pink.opacity(0.2).edgesIgnoringSafeArea(.all))
     }
 }
+
+
+/* FavoriteRecipes Page Objects/Delcarations Below
+
+*/
+
+@Model
+class FavoriteRecipes: ObservableObject {
+    var recipes: [Recipe] = [
+        Recipe(name: "New Recipe", rating: 5, ingredients: [])
+    ]
+    
+    init(recipes: [Recipe]) {
+        self.recipes = recipes
+    }
+    
+    // Function to add a recipe
+        func addRecipe() {
+            let newRecipe = Recipe(name: "New Recipe", rating: 5, ingredients: [])
+            recipes.append(newRecipe)
+        }
+        
+    // Function to delete a recipe
+        func deleteRecipe(at offsets: IndexSet) {
+            recipes.remove(atOffsets: offsets)
+        }
+}
+
+@Model
+struct Recipe: Identifiable {
+    var id = UUID()
+    var name: String
+    var rating: Double
+    var ingredients: [String]
+    
+    init(id: UUID = UUID(), name: String, rating: Double, ingredients: [String]) {
+        self.id = id
+        self.name = name
+        self.rating = rating
+        self.ingredients = ingredients
+    }
+}
+
+struct RecipesView: View {
+    @EnvironmentObject var favoriteRecipes: FavoriteRecipes
+        
+        var body: some View {
+            List {
+                ForEach($favoriteRecipes.recipes) { $recipe in
+                    NavigationLink(destination: RecipeDetailView(recipe: $recipe)) {
+                        HStack {
+                            Text(recipe.name)
+                            Spacer()
+                            Text(String(format: "%.1f", recipe.rating))
+                                .foregroundColor(.gray)
+                        }
+                    }
+                }
+                .onDelete(perform: favoriteRecipes.deleteRecipe)
+                
+                Button(action: favoriteRecipes.addRecipe) {
+                    HStack {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundColor(.green)
+                        Text("Add New Recipe")
+                    }
+                }
+            }
+            .navigationTitle("My Favorites")
+        }
+
+    }
+
+struct EditRatingView: View {
+    @Binding var recipe: Recipe
+        
+        var body: some View {
+            Form {
+                Section(header: Text("Rating")) {
+                    Slider(value: $recipe.rating, in: 0...5, step: 0.1) {
+                        Text("Rating")
+                    }
+                    Text("\(recipe.rating, specifier: "%.1f") Stars")
+                }
+            }
+            .navigationBarTitle("Edit Rating", displayMode: .inline)
+        }
+}
+struct EditIngredientsView: View {
+    @Binding var ingredients: [String]
+    @State private var newIngredient: String = ""
+    
+    var body: some View {
+        List {
+            Section(header: Text("Add Ingredient")) {
+                HStack {
+                    TextField("New Ingredient", text: $newIngredient)
+                    Button(action: {
+                        withAnimation {
+                            ingredients.append(newIngredient)
+                            newIngredient = ""
+                        }
+                    }) {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundColor(.green)
+                    }
+                }
+            }
+            
+            Section(header: Text("Ingredients")) {
+                ForEach(ingredients, id: \.self) { ingredient in
+                    Text(ingredient)
+                }
+                .onDelete(perform: deleteIngredient)
+            }
+        }
+        .navigationBarTitle("Edit Ingredients", displayMode: .inline)
+    }
+    
+    private func deleteIngredient(at offsets: IndexSet) {
+        ingredients.remove(atOffsets: offsets)
+    }
+}
+
+struct RecipeDetailView: View {
+    @Binding var recipe: Recipe
+    
+    var body: some View {
+        Form {
+            Section(header: Text("Recipe Name")) {
+                TextField("Name", text: $recipe.name)
+            }
+            
+            Section(header: Text("Rating")) {
+                NavigationLink(destination: EditRatingView(recipe: $recipe)) {
+                    Text("Edit Rating")
+                }
+            }
+            
+            Section(header: Text("Ingredients")) {
+                NavigationLink(destination: EditIngredientsView(ingredients: $recipe.ingredients)) {
+                    Text("Edit Ingredients")
+                }
+            }
+        }
+        .navigationBarTitle("Recipe Details", displayMode: .inline)
+    }
+}
+
+
+
+
 
 
 
