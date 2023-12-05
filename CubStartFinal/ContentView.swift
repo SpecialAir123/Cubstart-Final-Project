@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 class UserSession: ObservableObject {
     @Published var isLoggedIn: Bool = false
@@ -18,7 +17,7 @@ class UserCredentials: ObservableObject {
     @Published var confirmed_password: String = ""
 }
 
-struct ContentView: View {
+struct FeastLoginView: View {
     // Environment objects for managing user session and credentials
     @EnvironmentObject var userSession: UserSession
     @EnvironmentObject var userCredentials: UserCredentials
@@ -32,9 +31,7 @@ struct ContentView: View {
     @State private var showSignUpSuccessMessage = false
     
     // Connects RecipeBook Screen
-    @Environment(\.modelContext) private var
-        modelContext
-    @Query var favoriteRecipes: [Recipe]
+    @StateObject var favoriteRecipes = FavoriteRecipes()
 
     var body: some View {
         NavigationView {
@@ -162,13 +159,12 @@ struct ContentView: View {
 }
 
 
-    
 
 struct FeastLoginView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        FeastLoginView()
             .environmentObject(UserSession()) // Providing UserSession environment object for the preview
-            .environmentObject(FavoriteRecipes(recipes:[]))
+            .environmentObject(FavoriteRecipes())
     }
 }
 
@@ -346,41 +342,11 @@ struct EditProfileView: View {
 
 */
 
-@Model
-class FavoriteRecipes: ObservableObject {
-    var recipes: [Recipe] = [
-        Recipe(name: "New Recipe", rating: 5, ingredients: [])
-    ]
-    
-    init(recipes: [Recipe]) {
-        self.recipes = recipes
-    }
-    
-    // Function to add a recipe
-        func addRecipe() {
-            let newRecipe = Recipe(name: "New Recipe", rating: 5, ingredients: [])
-            recipes.append(newRecipe)
-        }
-        
-    // Function to delete a recipe
-        func deleteRecipe(at offsets: IndexSet) {
-            recipes.remove(atOffsets: offsets)
-        }
-}
-
-@Model
 struct Recipe: Identifiable {
     var id = UUID()
     var name: String
     var rating: Double
     var ingredients: [String]
-    
-    init(id: UUID = UUID(), name: String, rating: Double, ingredients: [String]) {
-        self.id = id
-        self.name = name
-        self.rating = rating
-        self.ingredients = ingredients
-    }
 }
 
 struct RecipesView: View {
@@ -398,9 +364,9 @@ struct RecipesView: View {
                         }
                     }
                 }
-                .onDelete(perform: favoriteRecipes.deleteRecipe)
+                .onDelete(perform: deleteRecipe)
                 
-                Button(action: favoriteRecipes.addRecipe) {
+                Button(action: addRecipe) {
                     HStack {
                         Image(systemName: "plus.circle.fill")
                             .foregroundColor(.green)
@@ -410,8 +376,23 @@ struct RecipesView: View {
             }
             .navigationTitle("My Favorites")
         }
-
+        
+        private func deleteRecipe(at offsets: IndexSet) {
+            favoriteRecipes.recipes.remove(atOffsets: offsets)
+        }
+        
+        private func addRecipe() {
+            favoriteRecipes.recipes.append(Recipe(name: "New Recipe", rating: 5, ingredients: []))
+        }
     }
+class FavoriteRecipes: ObservableObject {
+    @Published var recipes: [Recipe] = [
+        Recipe(name: "Insert Recipe Here", rating: 4.5, ingredients: []),
+        Recipe(name: "Chocolate Lava Cake", rating: 4.7, ingredients: []),
+        Recipe(name: "Lemon Pork Loin", rating: 4.5, ingredients: []),
+        Recipe(name: "Roast Beef Sandwich", rating: 4.6, ingredients: [])
+    ]
+}
 
 struct EditRatingView: View {
     @Binding var recipe: Recipe
