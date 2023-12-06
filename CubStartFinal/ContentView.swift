@@ -253,7 +253,7 @@ struct ProfileView: View {
     var userPhoto: String = "userPlaceholder" // Placeholder for user photo
 
     // States for managing editable profile data and view control
-    @State private var editableProfileData = EditableProfileData(age: "", sex: "", country: "")
+    @State private var editableProfileData = EditableProfileData(made: "", goal: "", fav: "")
     @State private var showingEditProfile = false
 
     var body: some View {
@@ -276,9 +276,9 @@ struct ProfileView: View {
 
                 // Group of text displaying user's editable profile data
                 Group {
-                    Text("Age: \(editableProfileData.age)")
-                    Text("Sex: \(editableProfileData.sex)")
-                    Text("Country: \(editableProfileData.country)")
+                    Text("What I Made This Week: \(editableProfileData.made)")
+                    Text("Next Thing To Cook: \(editableProfileData.goal)")
+                    Text("Favorite Cuisine: \(editableProfileData.fav)")
                 }
                 .font(.body)
                 .foregroundColor(.black)
@@ -288,14 +288,7 @@ struct ProfileView: View {
                     VStack {
                         Text("Recipes Saved")
                             .font(.headline)
-                        Text("25")
-                            .font(.title2)
-                    }
-                    Spacer()
-                    VStack {
-                        Text("Recipes Shared")
-                            .font(.headline)
-                        Text("15")
+                        Text("\(favoriteRecipes.recipes.count)")
                             .font(.title2)
                     }
                 }.padding()
@@ -345,9 +338,9 @@ struct ProfileView: View {
 }
 
 struct EditableProfileData {
-    var age: String
-    var sex: String
-    var country: String
+    var made: String
+    var goal: String
+    var fav: String
 }
 
 struct EditProfileView: View {
@@ -368,7 +361,7 @@ struct EditProfileView: View {
                 .padding(.top, 20)
 
             // Text field for editing the age
-            TextField("Age", text: $profileData.age)
+            TextField("What I Made This Week", text: $profileData.made)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
                 .background(Color.white)
@@ -376,7 +369,7 @@ struct EditProfileView: View {
                 .shadow(radius: 5)
             
             // Text field for editing the sex
-            TextField("Sex", text: $profileData.sex)
+            TextField("Next Thing to Cook", text: $profileData.goal)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
                 .background(Color.white)
@@ -384,7 +377,7 @@ struct EditProfileView: View {
                 .shadow(radius: 5)
 
             // Text field for editing the country
-            TextField("Country", text: $profileData.country)
+            TextField("Favorite Cuisine", text: $profileData.fav)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
                 .background(Color.white)
@@ -414,11 +407,17 @@ struct EditProfileView: View {
 
 */
 
+struct Ingredient: Identifiable {
+    var id = UUID()
+    var name: String
+    var amount: String
+}
+
 struct Recipe: Identifiable {
     var id = UUID()
     var name: String
     var rating: Double
-    var ingredients: [String]
+    var ingredients: [Ingredient]
 }
 
 struct RecipesView: View {
@@ -460,7 +459,6 @@ struct RecipesView: View {
 
 class FavoriteRecipes: ObservableObject {
     @Published var recipes: [Recipe] = [
-        Recipe(name: "Insert Recipe Here", rating: 4.5, ingredients: []),
         Recipe(name: "Chocolate Lava Cake", rating: 4.7, ingredients: []),
         Recipe(name: "Lemon Pork Loin", rating: 4.5, ingredients: []),
         Recipe(name: "Roast Beef Sandwich", rating: 4.6, ingredients: [])
@@ -483,29 +481,32 @@ struct EditRatingView: View {
         }
 }
 struct EditIngredientsView: View {
-    @Binding var ingredients: [String]
-    @State private var newIngredient: String = ""
+    @Binding var ingredients: [Ingredient]
+    @State private var newName: String = ""
+    @State private var newAmount: String = ""
     
     var body: some View {
         List {
             Section(header: Text("Add Ingredient")) {
-                HStack {
-                    TextField("New Ingredient", text: $newIngredient)
-                    Button(action: {
-                        withAnimation {
-                            ingredients.append(newIngredient)
-                            newIngredient = ""
-                        }
-                    }) {
-                        Image(systemName: "plus.circle.fill")
-                            .foregroundColor(.green)
-                    }
+                TextField("Ingredient Name", text: $newName)
+                TextField("Amount (e.g., 2 cups)", text: $newAmount)
+                Button("Add") {
+                    let ingredient = Ingredient(name: newName, amount: newAmount)
+                    ingredients.append(ingredient)
+                    // Reset the input fields after adding
+                    newName = ""
+                    newAmount = ""
                 }
             }
-            
-            Section(header: Text("Ingredients")) {
-                ForEach(ingredients, id: \.self) { ingredient in
-                    Text(ingredient)
+
+            Section(header: Text("Current Ingredients")) {
+                ForEach(ingredients) { ingredient in
+                    VStack(alignment: .leading) {
+                        Text(ingredient.name)
+                            .fontWeight(.bold)
+                        Text(ingredient.amount)
+                            .italic()
+                    }
                 }
                 .onDelete(perform: deleteIngredient)
             }
