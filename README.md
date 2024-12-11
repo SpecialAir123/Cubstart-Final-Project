@@ -24,19 +24,18 @@ The welcoming login screen features:
 - Custom-designed logo with chef's hat and utensils
 - Easy access to sign up for new users
 
-### Profile View
+### Profile View and Recipe Details
 
-![Simulator Screenshot - iPhone 15 - 2024-12-10 at 21 29 47](https://github.com/user-attachments/assets/5e8487ac-f3df-4d83-8948-599efda110c8)
+<p float="left">
+  <img src="https://github.com/user-attachments/assets/5e8487ac-f3df-4d83-8948-599efda110c8" width="250">
+  <img src="https://github.com/user-attachments/assets/85ede8c5-ad44-4d9d-83eb-27e53aec7922" width="250">
+</p>
 
 The profile interface showcases:
 - Personal cooking statistics
 - Recent cooking activities
 - Future cooking plans
 - Quick access to saved recipes
-
-### Recipe Details
-
-![Simulator Screenshot - iPhone 15 - 2024-12-10 at 21 30 11](https://github.com/user-attachments/assets/85ede8c5-ad44-4d9d-83eb-27e53aec7922)
 
 
 The recipe management system includes:
