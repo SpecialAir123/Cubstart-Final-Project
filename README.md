@@ -15,7 +15,7 @@ Culinary Connect is a Swift-based iOS application designed to help cooking enthu
 
 ### Login Screen
 
-![Simulator Screenshot - iPhone 15 - 2024-12-10 at 21 32 25](https://github.com/user-attachments/assets/d26a9111-a354-433d-ac40-010035cfa544)
+<img src="https://github.com/user-attachments/assets/d26a9111-a354-433d-ac40-010035cfa544" width="300">
 
 
 The welcoming login screen features:
